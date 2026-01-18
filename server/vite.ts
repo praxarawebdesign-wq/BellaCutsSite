@@ -71,10 +71,13 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // When bundled, __dirname points to dist/, so public folder is at ./public
-  const distPath = path.resolve(__dirname, "public");
+  // Use current working directory to find dist/public, more reliable for deployment
+  const distPath = path.resolve(process.cwd(), "dist", "public");
 
   if (!fs.existsSync(distPath)) {
+    console.error(`Build directory not found at: ${distPath}`);
+    console.error(`Current working directory: ${process.cwd()}`);
+    console.error(`Directory contents:`, fs.readdirSync(process.cwd()));
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
