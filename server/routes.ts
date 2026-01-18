@@ -1,7 +1,6 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
+import type { Application } from "express";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Application): Promise<void> {
   app.post("/api/contact", (_req, res) => {
     res.json({
       success: true,
@@ -15,7 +14,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
       message: "This is a dummy endpoint and does not store submissions.",
     });
   });
-
-  const httpServer = createServer(app);
-  return httpServer;
 }
