@@ -39,31 +39,43 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
+    console.log("Starting server initialization...");
+    
     await registerRoutes(app);
+    console.log("Routes registered");
 
     const env = process.env.NODE_ENV || "development";
+    console.log(`Environment: ${env}`);
     app.set("env", env);
 
     const server = createServer(app);
+    console.log("HTTP server created");
 
     if (env === "development") {
+      console.log("Setting up Vite dev server...");
       await setupVite(app, server);
+      console.log("Vite dev server ready");
     } else {
+      console.log("Setting up static file serving...");
       serveStatic(app);
+      console.log("Static file serving ready");
     }
 
     app.use((err: any, _req, res, _next) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
+      console.error(`Error handler caught: ${status} ${message}`);
       res.status(status).json({ message });
     });
 
     const port = parseInt(process.env.PORT || "5000", 10);
     server.listen(port, "0.0.0.0", () => {
+      console.log(`✅ Server successfully started on port ${port} in ${env} mode`);
       log(`serving on port ${port}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
+    console.error("❌ Failed to start server:", error);
+    console.error("Stack trace:", error instanceof Error ? error.stack : "N/A");
     process.exit(1);
   }
 })();
