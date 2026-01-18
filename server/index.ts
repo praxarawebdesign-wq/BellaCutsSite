@@ -50,7 +50,11 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Set NODE_ENV for Express app (defaults to 'development')
+  const env = process.env.NODE_ENV || 'development';
+  app.set("env", env);
+  
+  if (env === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
