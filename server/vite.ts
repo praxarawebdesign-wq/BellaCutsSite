@@ -77,16 +77,34 @@ export function serveStatic(app: Express) {
   if (!fs.existsSync(distPath)) {
     console.error(`Build directory not found at: ${distPath}`);
     console.error(`Current working directory: ${process.cwd()}`);
-    console.error(`Directory contents:`, fs.readdirSync(process.cwd()));
+    if (fs.existsSync(process.cwd())) {
+      try {
+        console.error(`Directory contents:`, fs.readdirSync(process.cwd()));
+      } catch (e) {
+        console.error(`Cannot read directory:`, e);
+      }
+    }
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
   }
 
-  app.use(express.static(distPath));
+  // Serve static files from dist/public
+  app.use(express.static(distPath, { index: false }));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  // API routes should be handled before this catch-all
+  // Fall through to index.html for all non-API routes
+  app.get("*", (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    
+    const indexPath = path.join(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send("Not Found");
+    }
   });
 }
