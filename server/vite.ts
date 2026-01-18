@@ -71,7 +71,8 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(__dirname, "..", "dist", "public");
+  // When bundled, __dirname points to dist/, so public folder is at ./public
+  const distPath = path.resolve(__dirname, "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
