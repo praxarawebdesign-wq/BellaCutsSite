@@ -25,12 +25,21 @@ export default function ContactSection() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simple dummy submission - always succeeds
-    setTimeout(() => {
+    try {
+      // POST to dummy API endpoint (demo only - nothing stored)
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await response.json();
+      
       toast({
         title: "Message Sent Successfully!",
-        description: "Thank you for your message! We're just a demo so nothing is submitted.",
+        description: data.message || "Thank you for your message! We're just a demo so nothing is submitted.",
       });
+      
       setFormData({
         firstName: "",
         lastName: "",
@@ -40,8 +49,14 @@ export default function ContactSection() {
         budget: "",
         projectDetails: "",
       });
+    } catch (error) {
+      toast({
+        title: "Message Sent Successfully!",
+        description: "Thank you for your message! (Demo only - nothing stored)",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 500);
+    }
   };
 
   return (
